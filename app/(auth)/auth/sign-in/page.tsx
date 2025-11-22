@@ -1,11 +1,13 @@
-import React from 'react'
+import SignInFormClient from "@/modules/auth/components/sign-in-form-client";
+import Image from "next/image";
 
 const Page = () => {
   return (
-    <div>
-      Sign In Page
-    </div>
-  )
-}
+    <>
+      <Image src={"/login.svg"} alt="Login Image" height={300} width={300} className="m-4"/>
+      <SignInFormClient />
+    </>
+  );
+};
 
-export default Page
+export default Page;
