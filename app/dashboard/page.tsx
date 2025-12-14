@@ -2,7 +2,8 @@ import { getAllPlaygroundForUser } from "@/modules/dashboard/actions";
 import AddNewButton from "@/modules/dashboard/components/add-new";
 import AddRepo from "@/modules/dashboard/components/add-repo";
 import EmptyState from "@/modules/dashboard/components/empty-state";
-import React from "react";
+import ProjectTable from "@/modules/dashboard/components/project-table";
+import type { Project } from "@/modules/dashboard/types";
 
 const Page = async () => {
   const playgrounds = await getAllPlaygroundForUser();
@@ -19,10 +20,11 @@ const Page = async () => {
             <EmptyState />
           ) : (
             <ProjectTable
-            projects={playgrounds || []}
-            onDeleteProject={()=>{}}
-            onUpdateProject={()=>{}}
-            onDuplicateProject={()=>{}}
+            projects={playgrounds as Project[] || []}
+            onDeleteProject={(id)=>{return new Promise<void>(()=>{})}}
+            onUpdateProject={(id)=>{return new Promise<void>(()=>{})}}
+            onDuplicateProject={(id)=>{return new Promise<void>(()=>{})}}
+            onMarkasFavorite={(id)=>{return new Promise<void>(()=>{})}}
             />
           )
         }
