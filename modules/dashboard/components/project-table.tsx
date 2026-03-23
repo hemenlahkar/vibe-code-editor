@@ -54,6 +54,7 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { type Playground } from "@prisma/client";
+import MarkedToggleButton from "./marked-toggle-button";
 
 interface ProjectTableProps {
   projects: Project[];
@@ -63,7 +64,7 @@ interface ProjectTableProps {
   ) => Promise<void>;
   onDeleteProject?: (id: string) => Promise<void>;
   onDuplicateProject?: (id: string) => Promise<Playground | undefined>;
-  onMarkasFavorite?: (id: string) => Promise<void>;
+  onMarkasFavorite?: (playgroundId: string, isChecked: boolean) => Promise<unknown>;
 }
 
 interface EditProjectData {
@@ -193,7 +194,7 @@ export default function ProjectTable({
                 <TableCell>
                   <Badge
                     variant="outline"
-                    className="bg-[#E93F3F15] text-[#E93F3F] border-[#E93F3F]"
+                    className="bg-[#E93F3F15] text-[#e9ae3f] border-[#f89e38]"
                   >
                     {project.template}
                   </Badge>
@@ -225,10 +226,10 @@ export default function ProjectTable({
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end" className="w-48">
                       <DropdownMenuItem asChild>
-                        {/* <MarkedToggleButton
+                        <MarkedToggleButton
                           markedForRevision={project.Starmark[0]?.isMarked}
                           id={project.id}
-                        /> */}
+                        />
                       </DropdownMenuItem>
                       <DropdownMenuItem asChild>
                         <Link

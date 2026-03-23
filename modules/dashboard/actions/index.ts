@@ -14,6 +14,14 @@ export const getAllPlaygroundForUser = async () => {
       },
       include: {
         user: true,
+        Starmark: {
+          where: {
+            userId: user?.id!,
+          },
+          select: {
+            isMarked: true,
+          },
+        },
       },
     });
 
@@ -30,7 +38,7 @@ export const createPlayground = async (data: {
 }) => {
   try {
     const user = await currentUser();
-    if(!user) throw new Error("Unauthorized access");
+    if (!user) throw new Error("Unauthorized access");
     const { template, title, description } = data;
 
     const playground = await db.playground.create({
@@ -48,42 +56,44 @@ export const createPlayground = async (data: {
   }
 };
 
-export const deleteProjectById = async (id: string) =>
-{
+export const deleteProjectById = async (id: string) => {
   try {
     await db.playground.delete({
       where: {
-        id
-      }
+        id,
+      },
     });
     revalidatePath("/dashboard");
   } catch (error) {
     console.log(error);
   }
-}
+};
 
-export const editProjectById = async (id: string, data: {title?: string; description?: string}) => {
-    try {
-      await db.playground.update({
-        where:{
-          id
-        },
-        data
-      });
-      revalidatePath("/dashboard");
-    } catch (error) {
-      console.log(error);
-    }
-}
+export const editProjectById = async (
+  id: string,
+  data: { title?: string; description?: string },
+) => {
+  try {
+    await db.playground.update({
+      where: {
+        id,
+      },
+      data,
+    });
+    revalidatePath("/dashboard");
+  } catch (error) {
+    console.log(error);
+  }
+};
 
 export const duplicateProjectById = async (id: string) => {
   try {
     const originalPlayground = await db.playground.findUnique({
-      where: {id},
+      where: { id },
       // todo: add template files
     });
 
-    if(!originalPlayground) {
+    if (!originalPlayground) {
       throw new Error("Original playground not found");
     }
 
@@ -95,7 +105,7 @@ export const duplicateProjectById = async (id: string) => {
         userId: originalPlayground.userId,
 
         // todo: add template files
-      }
+      },
     });
 
     revalidatePath("/dashboard");
@@ -103,8 +113,41 @@ export const duplicateProjectById = async (id: string) => {
   } catch (error) {
     console.log(error);
   }
-}
+};
 
-export const markAsFavorite = async (id: string) => {
-  
-}
+export const toggleStarMarked = async (
+  playgroundId: string,
+  isChecked: boolean,
+) => {
+  const user = await currentUser();
+  const userId = user?.id;
+
+  if (!userId) {
+    throw new Error("User Id is Required");
+  }
+
+  try {
+    if (isChecked) {
+      await db.starMark.create({
+        data: {
+          userId,
+          playgroundId,
+          isMarked: isChecked,
+        },
+      });
+    } else {
+      await db.starMark.deleteMany({
+        where: {
+          userId,
+          playgroundId,
+        },
+      });
+    }
+
+    revalidatePath("/dashboard");
+    return { success: true, isMarked: isChecked };
+  } catch (error) {
+    console.error("Error updating problem:", error);
+    return { success: false, error: "Failed to update problem" };
+  }
+};
